@@ -1,0 +1,11 @@
+{
+  "name": "xiaozhi-client-railway",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {
+    "xiaozhi-client": "^1.0.3"
+  }
+}
