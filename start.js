@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import express from 'express';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,7 +43,7 @@ function startXiaozhi() {
     console.log(`[xiaozhi] ${data}`);
   });
   
-  client.stderr.on('data', (data)) => {
+  client.stderr.on('data', (data) => {
     console.error(`[xiaozhi-error] ${data}`);
   });
   
@@ -58,7 +59,6 @@ createConfig();
 startXiaozhi();
 
 // Простой HTTP сервер для health check
-import express from 'express';
 const app = express();
 const port = process.env.PORT || 8080;
 
