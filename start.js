@@ -1,6 +1,5 @@
 import { exec } from 'child_process';
 import express from 'express';
-import fs from 'fs';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -14,18 +13,18 @@ app.listen(port, '0.0.0.0', () => {
   console.log(`✅ Health check сервер на порту ${port}`);
 });
 
-// Проверяем наличие config файла
-if (!fs.existsSync('./xiaozhi.config.json')) {
-  console.error('❌ Файл xiaozhi.config.json не найден!');
+// Просто передаём MCP_ENDPOINT из переменных окружения
+const mcpEndpoint = process.env.MCP_ENDPOINT;
+
+if (!mcpEndpoint) {
+  console.error('❌ MCP_ENDPOINT не задан в переменных окружения');
   process.exit(1);
 }
 
-// Читаем конфиг
-const config = JSON.parse(fs.readFileSync('./xiaozhi.config.json', 'utf8'));
-console.log('✅ Конфигурация загружена, mcpEndpoint:', config.mcpEndpoint);
+console.log('✅ MCP Endpoint настроен');
 
-// Запускаем xiaozhi-client с явным указанием конфига
-const client = exec('npx xiaozhi-client start --config xiaozhi.config.json');
+// Запускаем xiaozhi-client с передачей endpoint через параметр
+const client = exec(`npx xiaozhi-client start --mcp-endpoint "${mcpEndpoint}"`);
 
 client.stdout.on('data', (data) => {
   console.log(`[xiaozhi] ${data}`);
@@ -37,5 +36,10 @@ client.stderr.on('data', (data) => {
 
 client.on('close', (code) => {
   console.log(`xiaozhi-client завершил работу с кодом ${code}`);
-  process.exit(code);
+  // Не завершаем процесс, а перезапускаем
+  setTimeout(() => {
+    console.log('🔄 Перезапуск...');
+    const newClient = exec(`npx xiaozhi-client start --mcp-endpoint "${mcpEndpoint}"`);
+    // ... перенаправляем вывод
+  }, 5000);
 });
